@@ -571,7 +571,29 @@
                 </button>
             </div>
         </div>
-    </nav>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search projects or games..."
+                aria-label="Search projects"
+            />
+        </div>
+
+        <div class="nav-controls">
+            <button type="button" class="sound-toggle" id="soundToggle" aria-label="Mute sounds">
+                <i class="fas fa-volume-up" aria-hidden="true"></i>
+            </button>
+
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to light mode">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+</nav>
 
     <main id="main-content" tabindex="-1">
         <!-- Hero Section -->
@@ -687,7 +709,7 @@
                         </div>
                         <h3>Word Scramble</h3>
                         <p>Unscramble words before attempts run out!</p>
-                        <button class="btn-play">Play Now</button>
+                        <button class="btn-play">Try It</button>
                     </div>
 
                     <div class="project-card" data-category="games" data-project="flames">
@@ -696,7 +718,7 @@
                         </div>
                         <h3>FLAMES Game</h3>
                         <p>Discover your relationship status!</p>
-                        <button class="btn-play">Play Now</button>
+                        <button class="btn-play">Try It</button>
                     </div>
 
                     <div class="project-card" data-category="games" data-project="dots-boxes">
@@ -705,7 +727,7 @@
                         </div>
                        <h3>Dots & Boxes AI</h3> 
                         <p>Challenge friends or AI in this strategy game!</p>
-                        <button class="btn-play">Play Now</button>
+                        <button class="btn-play">Try It</button>
                     </div>
 
                     <div class="project-card" data-category="games" data-project="password-forge">
@@ -1161,6 +1183,32 @@
     <script>
         lucide.createIcons();
     </script>
+    <!-- Search Functionality -->
+<script>
+const searchInput = document.getElementById("searchInput");
+
+// Select all project cards
+const projectCards = document.querySelectorAll(".project-card");
+
+searchInput.addEventListener("input", () => {
+    const searchValue = searchInput.value.toLowerCase();
+
+    projectCards.forEach(card => {
+        const title = card.querySelector("h3").textContent.toLowerCase();
+        const description = card.querySelector("p").textContent.toLowerCase();
+
+        if (
+            title.includes(searchValue) ||
+            description.includes(searchValue)
+        ) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+});
+</script>
+
 </body>
 
 </html>

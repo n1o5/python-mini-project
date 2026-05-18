@@ -113,6 +113,10 @@ function get2048GameHTML() {
 
     transform: scale(1.05);
 }
+    .game-btn{
+        padding:20px;
+        border-radius:30px;
+    }
 
             </style>
 

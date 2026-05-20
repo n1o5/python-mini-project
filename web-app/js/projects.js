@@ -1,4 +1,4 @@
-// Project Registry
+﻿// Project Registry
 // Each project's HTML and logic lives in its own file under js/projects/
 
 function getProjectHTML(projectName) {
@@ -3483,7 +3483,7 @@ function getTowerOfHanoiHTML() {
         optimalMovesEl.textContent = Math.pow(2, diskCount) - 1;
         moveCountEl.textContent = '0';
         drawTowers();
-    }
+    
     
     function drawTowers() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -3555,7 +3555,7 @@ function getTowerOfHanoiHTML() {
 
     return projects[projectName] || '<h2>Project Coming Soon!</h2>';
 }
-}
+
 
 function getTicTacToeHTML() {
     return `

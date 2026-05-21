@@ -105,8 +105,8 @@ document.addEventListener('DOMContentLoaded', function () {
         syncThemeColor(savedTheme);
         themeToggle.innerHTML =
             savedTheme === 'light'
-                ? '<i class="fas fa-sun" aria-hidden="true"></i>'
-                : '<i class="fas fa-moon" aria-hidden="true"></i>';
+                ? '<img src="assets/sun.svg" alt="" aria-hidden="true" class="theme-icon">'
+                : '<img src="assets/moon.svg" alt="" aria-hidden="true" class="theme-icon">';
         updateThemeToggleAria(savedTheme === 'light');
 
         themeToggle.addEventListener('click', function () {
@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             themeToggle.innerHTML =
                 newTheme === 'light'
-                    ? '<i class="fas fa-sun" aria-hidden="true"></i>'
-                    : '<i class="fas fa-moon" aria-hidden="true"></i>';
+                    ? '<img src="assets/sun.svg" alt="" aria-hidden="true" class="theme-icon">'
+                    : '<img src="assets/moon.svg" alt="" aria-hidden="true" class="theme-icon">';
             updateThemeToggleAria(newTheme === 'light');
         });
     }

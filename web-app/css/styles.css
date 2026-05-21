@@ -118,7 +118,6 @@ body {
 }
 
 .container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -138,11 +137,9 @@ body {
 
 .navbar .container {
     display: flex;
-    justify-content: space-between;
+    justify-content:space-around;
     align-items: center;
-    gap: 2rem;
 }
-
 .navbar-brand {
     display: flex;
     align-items: baseline;
@@ -557,8 +554,9 @@ body {
     display: flex;
     gap: 1.05rem;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 1.1rem;
+    /* margin-bottom: 1.1rem; */
     animation: fadeInUp 0.7s ease 0.4s both;
 }
 
@@ -1235,6 +1233,12 @@ body {
     max-width: 600px;
     margin: 0 auto;
 }
+.search-box-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+}
 
 .search-box {
     position: relative;
@@ -1244,6 +1248,7 @@ body {
     padding: 0.5rem 1.5rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
     transition: var(--transition);
 }

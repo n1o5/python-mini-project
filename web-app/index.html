@@ -800,8 +800,8 @@
         🚀 Skip to main content
     </a>
 <!-- Navigation -->
-<nav aria-label="Primary" class="navbar">
-<div class="container nav-wrapper">
+<nav aria-label="Primary" class="navbar" id="mainNavbar">
+<div class="nav-island">
 <!-- LEFT -->
 <div class="navbar-brand">
 <a class="logo-wrap" href="#">
@@ -824,8 +824,12 @@
 <i class="fas fa-search"></i>
 <input aria-label="Search projects" id="searchInput" placeholder="Search projects or games..." type="text"/>
 </div>
+<!-- HAMBURGER TOGGLE (mobile) -->
+<button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+<i class="fas fa-bars"></i>
+</button>
 <!-- RIGHT -->
-<div class="nav-controls">
+<div class="nav-controls" id="navControls">
 <button aria-label="Mute sounds" class="sound-toggle" id="soundToggle" type="button">
 <i class="fas fa-volume-up"></i>
 </button>
@@ -1426,6 +1430,34 @@ print('Hello, World!')" spellcheck="false"></textarea>
                 }
             });
         });
+
+    // Handle Scroll Transitions to resize the floating layout dynamically
+    const mainNavbar = document.getElementById("mainNavbar");
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 40) {
+            mainNavbar.classList.add("scrolled");
+        } else {
+            mainNavbar.classList.remove("scrolled");
+        }
+    });
+
+    // Mobile Navigation Controls Open/Close interface handlers
+    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const navControls = document.getElementById("navControls");
+
+    mobileMenuToggle.addEventListener("click", () => {
+        const isActive = navControls.classList.toggle("mobile-active");
+        mobileMenuToggle.setAttribute("aria-expanded", isActive);
+        mobileMenuToggle.querySelector("i").className = isActive ? "fas fa-times" : "fas fa-bars";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!navControls.contains(e.target) && !mobileMenuToggle.contains(e.target) && navControls.classList.contains("mobile-active")) {
+            navControls.classList.remove("mobile-active");
+            mobileMenuToggle.setAttribute("aria-expanded", "false");
+            mobileMenuToggle.querySelector("i").className = "fas fa-bars";
+        }
+    });
     </script>
 </body>
 </html>

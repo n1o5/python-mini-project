@@ -1982,7 +1982,8 @@ function initFlames() {
         gameActive = true;
         instructionsDiv.textContent = "Watch the sequence...";
         startNewRound();
-    
+    });
+
     calculateBtn.addEventListener('click', calculateFlames);
     name1Input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') calculateFlames();

@@ -81,7 +81,6 @@ function getDerivativeCalculatorHTML() {
             button{
                 padding:15px;
                 border-radius:30px;
-                color: var(--text-color);
             }
         </style>
     `;

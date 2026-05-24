@@ -61,14 +61,14 @@ function getSnakeGameHTML() {
             }
             .controls-top {
                 margin-bottom: 15px;
-                margin-right: 140px; /* Aligns with canvas center offset */
+                margin-right: 140px;
             }
             .difficulty-box select {
                 padding: 6px 10px;
                 border-radius: 6px;
                 border: 1px solid var(--accent-border, #ccc);
-                background-color: #ffffff !important; /* Explicitly forces white background */
-                color: #222222 !important;            /* Explicitly forces dark gray/black text */
+                background-color: #ffffff !important;
+                color: #222222 !important;
                 font-size: 14px;
                 font-family: inherit;
                 font-weight: 500;
@@ -175,31 +175,30 @@ function getSnakeGameHTML() {
                 padding: 12px 25px;
                 cursor: pointer;
             }
-                #pause-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9;
-    color: white;
-}
-
-#pause-overlay h1 {
-    font-size: 3rem;
-}
+            #pause-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.6);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9;
+                color: white;
+            }
+            #pause-overlay h1 {
+                font-size: 3rem;
+            }
         </style>
     `;
 }
 
 // --- GAME LOGIC STATE ---
 let direction = { x: 0, y: 0 };
-let speed = 9; // System baseline operational configuration state
-let scoreMultiplier = 2; // Baseline multiplier scalar state
+let speed = 9;
+let scoreMultiplier = 2;
 let score = 0;
 let lastPaintTime = 0;
 let isPaused = false;
@@ -215,7 +214,7 @@ const CONFIG_DIFFICULTY = {
 
 function main(ctime) {
     const canvas = document.getElementById('snakeCanvas');
-    if (!canvas) return; // Exit loop if the game modal has been closed
+    if (!canvas) return;
 
     window.requestAnimationFrame(main);
     if ((ctime - lastPaintTime) / 1000 < 1 / speed) {
@@ -269,6 +268,9 @@ function gameEngine() {
         document.getElementById('final-score').innerHTML = score;
         document.getElementById('game-over-overlay').classList.remove('hidden');
 
+        // 🔊 Play game-over sound when snake collides with wall or itself
+        if (window.AudioManager) AudioManager.play('snake_die');
+
         // Execute persistent local evaluations
         checkAndSaveHighScore();
 
@@ -281,9 +283,13 @@ function gameEngine() {
 
     // Eating food
     if (snakeArr[0].y === food.y && snakeArr[0].x === food.x) {
-        score += (1 * scoreMultiplier); // Scaled multiplier calculations
+        score += (1 * scoreMultiplier);
         document.getElementById('score').innerHTML = score;
         snakeArr.unshift({ x: snakeArr[0].x + direction.x, y: snakeArr[0].y + direction.y });
+
+        // 🔊 Play eat sound when snake consumes food
+        if (window.AudioManager) AudioManager.play('snake_eat');
+
         let a = 2, b = 16;
         food = { x: Math.round(a + (b - a) * Math.random()), y: Math.round(a + (b - a) * Math.random()) };
     }
@@ -315,7 +321,6 @@ function gameEngine() {
 
 function restartGame() {
     const selector = document.getElementById('difficultySelect');
-    // Apply difficulty settings immediately so speed/score multiplier are correct on restart
     applyDifficultySettings();
     if (selector) selector.disabled = true;
 
@@ -344,6 +349,7 @@ function restartGame() {
         y: Math.round(2 + (16 - 2) * Math.random())
     };
 }
+
 function togglePause() {
     const pauseOverlay = document.getElementById('pause-overlay');
     const pauseBtn = document.getElementById('pauseGameBtn');
@@ -366,15 +372,12 @@ function togglePause() {
 function initSnakeGame() {
     window.requestAnimationFrame(main);
 
-    // Set initial rendering metrics
     updateBestScoreUI();
 
-    // Map difficulty listener parameters
     const selector = document.getElementById('difficultySelect');
     if (selector) {
         selector.addEventListener('change', applyDifficultySettings);
     }
-    // Initialize standard values configuration parameters
     applyDifficultySettings();
 
     document.getElementById('startGameBtn').addEventListener('click', () => {
@@ -386,7 +389,6 @@ function initSnakeGame() {
     document.getElementById('overlayRestartBtn').addEventListener('click', restartGame);
 
     window.addEventListener('keydown', e => {
-        // Disable difficulty selection once arrow keys are pressed
         if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
             if (selector && !selector.disabled) {
                 selector.disabled = true;
@@ -399,10 +401,10 @@ function initSnakeGame() {
         }
         if (isPaused) return;
         switch (e.key) {
-            case "ArrowUp": if (direction.y !== 1) { direction.x = 0; direction.y = -1; } break;
-            case "ArrowDown": if (direction.y !== -1) { direction.x = 0; direction.y = 1; } break;
-            case "ArrowLeft": if (direction.x !== 1) { direction.x = -1; direction.y = 0; } break;
-            case "ArrowRight": if (direction.x !== -1) { direction.x = 1; direction.y = 0; } break;
+            case "ArrowUp":    if (direction.y !== 1)  { direction.x = 0;  direction.y = -1; } break;
+            case "ArrowDown":  if (direction.y !== -1) { direction.x = 0;  direction.y = 1;  } break;
+            case "ArrowLeft":  if (direction.x !== 1)  { direction.x = -1; direction.y = 0;  } break;
+            case "ArrowRight": if (direction.x !== -1) { direction.x = 1;  direction.y = 0;  } break;
         }
     });
 
@@ -425,10 +427,10 @@ function initSnakeGame() {
             let dy = touchEndY - touchStartY;
 
             if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 30 && direction.x !== -1) { direction.x = 1; direction.y = 0; }
+                if (dx > 30 && direction.x !== -1)  { direction.x = 1;  direction.y = 0;  }
                 else if (dx < -30 && direction.x !== 1) { direction.x = -1; direction.y = 0; }
             } else {
-                if (dy > 30 && direction.y !== -1) { direction.x = 0; direction.y = 1; }
+                if (dy > 30 && direction.y !== -1)  { direction.x = 0;  direction.y = 1;  }
                 else if (dy < -30 && direction.y !== 1) { direction.x = 0; direction.y = -1; }
             }
         }, { passive: false });

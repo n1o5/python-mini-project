@@ -1072,52 +1072,66 @@ function trapFocus(modalEl) {
 
 function openProjectSafe(name, trigger) {
   if (!modal || !modalBody) return;
+  
+  // Force close and cleanup any existing modal first
+  if (modal.classList.contains("active")) {
+    // Manual cleanup without calling closeProjectSafe to avoid recursion
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.paddingRight = "";
+    document.body.style.overflow = "";
+    setMainInert(false);
+    
+    if (removeTrap) {
+      removeTrap();
+      removeTrap = null;
+    }
+    
+    // Clear content
+    modalBody.innerHTML = "";
+    if (modalTitle) modalTitle.textContent = "";
+  }
+  
   lastFocusedElement = trigger || document.activeElement;
+  
+  // Set modal active and lock body scroll
   modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
   var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.paddingRight = scrollbarWidth + "px";
   document.body.style.overflow = "hidden";
   setMainInert(true);
-
+  
+  // Load new content
   safeRun(function () {
+    var html = '';
     if (typeof getProjectHTML === "function") {
-      const rawHTML =
-      getProjectHTML(name) ||
-      '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
-
-      // Directly set HTML (we control the content)
-      modalBody.innerHTML = rawHTML;
-    } else {
-      modalBody.innerHTML =
-        '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
+      html = getProjectHTML(name);
     }
-    if (typeof initializeProject === "function") initializeProject(name);
+    
+    if (!html || html === 'undefined') {
+      html = '<div style="padding:1rem;color:var(--text-secondary)">Project content unavailable.</div>';
+    }
+    
+    modalBody.innerHTML = html;
+    
+    if (typeof initializeProject === "function") {
+      initializeProject(name);
+    }
     setupModalInfoButton(name);
-
-    // Inject info button next to the title (works for all projects)
+    
+    // Inject info button
     var projectContent = modalBody.querySelector(".project-content");
     if (projectContent) {
-      // Try to find the title element (could be h2, or other heading)
-      var firstHeading = projectContent.querySelector(
-        "h2, h3, .resume-analyzer-copy h2, .pet-title"
-      );
-
+      var firstHeading = projectContent.querySelector("h2, h3, .resume-analyzer-copy h2, .pet-title");
       if (!firstHeading) {
-        // If no heading found, look for any element with a title-like class
-        firstHeading = projectContent.querySelector(
-          '[class*="title"], [class*="header"] h2'
-        );
+        firstHeading = projectContent.querySelector('[class*="title"], [class*="header"] h2');
       }
-
       if (firstHeading && !projectContent.querySelector(".inline-info-btn")) {
-        // Create info button
         var infoBtn = document.createElement("button");
         infoBtn.className = "inline-info-btn";
         infoBtn.innerHTML = "ⓘ";
         infoBtn.setAttribute("aria-label", "How to use this project");
-
-        // Style the button
         infoBtn.style.marginLeft = "12px";
         infoBtn.style.background = "none";
         infoBtn.style.border = "none";
@@ -1125,7 +1139,7 @@ function openProjectSafe(name, trigger) {
         infoBtn.style.cursor = "pointer";
         infoBtn.style.color = "var(--accent)";
         infoBtn.style.verticalAlign = "middle";
-
+        
         infoBtn.addEventListener("click", function (e) {
           e.stopPropagation();
           if (typeof getProjectInstructions === "function") {
@@ -1133,8 +1147,7 @@ function openProjectSafe(name, trigger) {
             showInfoModal(info.title, info.steps);
           }
         });
-
-        // Make heading display inline if it's a block element
+        
         if (firstHeading.style.display !== "inline-block") {
           firstHeading.style.display = "inline-block";
         }
@@ -1142,31 +1155,45 @@ function openProjectSafe(name, trigger) {
       }
     }
   });
-
+  
+  // Setup focus trap
+  if (removeTrap) removeTrap();
   removeTrap = trapFocus(modal);
-  var focusables = getFocusableElements(modalBody);
-  var firstFocusable = focusables[0] || modalClose;
-  if (firstFocusable && typeof firstFocusable.focus === "function") {
-    firstFocusable.focus({ preventScroll: true });
-  }
+  
+  // Focus the close button for accessibility
+  setTimeout(function() {
+    if (modalClose && modalClose.focus) {
+      modalClose.focus({ preventScroll: true });
+    }
+  }, 100);
 }
 
 function closeProjectSafe() {
-  if (!modal || !modal.classList.contains("active")) return;
+  if (!modal) return;
+  
   modal.classList.remove("active");
   modal.setAttribute("aria-hidden", "true");
   document.body.style.paddingRight = "";
   document.body.style.overflow = "";
   setMainInert(false);
+  
   if (removeTrap) {
     removeTrap();
     removeTrap = null;
   }
+  
+  // Clear content
   if (modalBody) {
     modalBody.innerHTML = "";
   }
+  if (modalTitle) {
+    modalTitle.textContent = "";
+  }
+  
   if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
-    lastFocusedElement.focus({ preventScroll: true });
+    setTimeout(function() {
+      lastFocusedElement.focus({ preventScroll: true });
+    }, 50);
   }
   lastFocusedElement = null;
 }
@@ -1193,38 +1220,44 @@ projectCards.forEach(function (card) {
   var name = card.getAttribute("data-project");
 
   /* ── Favorite Button ──────────────────────────────────── */
-  var favBtn = document.createElement("button");
-  favBtn.className = "btn-favorite";
-  favBtn.setAttribute("aria-label", "Toggle favorite");
-  favBtn.innerHTML = '<i class="far fa-star"></i>';
+// Remove any existing favorite button first to avoid duplicates
+var existingFavBtn = card.querySelector(".btn-favorite");
+if (existingFavBtn) {
+  existingFavBtn.remove();
+}
 
-  var favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-  if (favorites.includes(name)) {
+var favBtn = document.createElement("button");
+favBtn.className = "btn-favorite";
+favBtn.setAttribute("aria-label", "Toggle favorite");
+favBtn.innerHTML = '<i class="far fa-star"></i>';
+
+var favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+if (favorites.includes(name)) {
+  favBtn.classList.add("active");
+  favBtn.innerHTML = '<i class="fas fa-star"></i>';
+}
+
+favBtn.addEventListener("click", function (e) {
+  e.stopPropagation();
+  var favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  var idx = favs.indexOf(name);
+  if (idx === -1) {
+    favs.push(name);
     favBtn.classList.add("active");
     favBtn.innerHTML = '<i class="fas fa-star"></i>';
-  }
-
-  favBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    var favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-    var idx = favs.indexOf(name);
-    if (idx === -1) {
-      favs.push(name);
-      favBtn.classList.add("active");
-      favBtn.innerHTML = '<i class="fas fa-star"></i>';
-    } else {
-      favs.splice(idx, 1);
-      favBtn.classList.remove("active");
-      favBtn.innerHTML = '<i class="far fa-star"></i>';
-      if (currentCategory === "favorites") {
-        card.style.display = "none";
-      }
+  } else {
+    favs.splice(idx, 1);
+    favBtn.classList.remove("active");
+    favBtn.innerHTML = '<i class="far fa-star"></i>';
+    if (currentCategory === "favorites") {
+      card.style.display = "none";
     }
-    localStorage.setItem("favorites", JSON.stringify(favs));
-  });
+  }
+  localStorage.setItem("favorites", JSON.stringify(favs));
+});
 
-  var cardActions = card.querySelector(".card-actions");
-  if (cardActions) cardActions.appendChild(favBtn);
+var cardActions = card.querySelector(".card-actions");
+if (cardActions) cardActions.appendChild(favBtn);
 
   /* ── Share Button ─────────────────────────────────────── */
   var shareBtn = document.createElement("button");

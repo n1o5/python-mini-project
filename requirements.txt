@@ -1,4 +1,3 @@
-# Game dependencies
 pygame==2.6.1
 
 # Math dependencies
@@ -9,6 +8,5 @@ pillow==12.2.0
 # Test dependencies
 pytest>=8.0.0
 
-# Utilities dependencies
 nltk==3.9.4
 requests==2.34.2
